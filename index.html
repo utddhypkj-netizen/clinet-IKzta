@@ -457,13 +457,6 @@
 <script>
 /* ============================================================
    CẤU HÌNH CLIENT - IKZTA
-   ============================================================
-   - name:   Tên client hiển thị
-   - icon:   Icon
-   - desc:   Mô tả ngắn
-   - link:   Link mở khi nhập đúng key
-   - key:    Key bí mật (KHÔNG hiển thị)
-   - bypass: Link vượt để lấy key (hiển thị dưới client)
    ============================================================ */
 const CLIENTS = [
     {
@@ -481,6 +474,15 @@ const CLIENTS = [
         link:   'https://deltaexploits.gg/delta-executor-android',
         key:    'IKzta:123:clinet:sieucap:androi',
         bypass: 'https://link4m.org/NkeUwPJ0'
+    },
+    /* ===== CODE X - ĐÃ THÊM ===== */
+    {
+        name: 'Code X',
+        icon: '💻',
+        desc: 'Client mã nguồn Code X',
+        link:   'https://example.com/code-x',        // <-- ĐỔI LINK MỞ
+        key:    'CODE-X-KEY',                        // <-- ĐỔI KEY
+        bypass: 'https://example.com/getkey-codex'   // <-- ĐỔI LINK VƯỢT
     }
 ];
 /* ============================================================ */
@@ -656,4 +658,4 @@ styleShake.textContent = `
 document.head.appendChild(styleShake);
 </script>
 </body>
-  </html>
+</html>
