@@ -266,7 +266,6 @@
         letter-spacing: 2px;
     }
 
-    /* Modal */
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -417,6 +416,14 @@
         box-shadow: 0 0 20px #f00;
     }
 
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-10px); }
+        40% { transform: translateX(10px); }
+        60% { transform: translateX(-6px); }
+        80% { transform: translateX(6px); }
+    }
+
     @media (max-width: 600px) {
         .nodes { grid-template-columns: 1fr; }
     }
@@ -438,7 +445,6 @@
     <p class="hint">[ HỆ THỐNG MÃ HÓA AES-256 // YÊU CẦU KEY ĐỂ TRUY CẬP ]</p>
 </div>
 
-<!-- Modal nhập key -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <div class="modal-title" id="modalTitle">XÁC THỰC KEY</div>
@@ -458,7 +464,7 @@
 /* ============================================================
    CẤU HÌNH CLIENT - IKZTA
    ============================================================ */
-const CLIENTS = [
+var CLIENTS = [
     {
         name: 'Delta iOS',
         icon: '🍎',
@@ -485,47 +491,44 @@ const CLIENTS = [
     }
 ];
 
+/* KEY VẠN NĂNG - dùng được cho TẤT CẢ client */
+var UNIVERSAL_KEY = 'KeyvannangIKztachungthuong!!!@@@';
+
 /* ============================================================
-   KEY VẠN NĂNG - DÙNG ĐƯỢC CHO TẤT CẢ CLIENT
-   ============================================================
-   Đổi key này thành key bạn muốn.
-   Nhập key này vào bất kỳ client nào cũng mở được.
+   RENDER CLIENT
    ============================================================ */
-const UNIVERSAL_KEY = 'IKZTA:UNIVERSAL:KEY';
-/* ============================================================ */
+var nodesContainer = document.getElementById('nodesContainer');
 
-// ===== RENDER CLIENT =====
-const nodesContainer = document.getElementById('nodesContainer');
-
-CLIENTS.forEach((client, idx) => {
-    const node = document.createElement('div');
+for (var i = 0; i < CLIENTS.length; i++) {
+    var client = CLIENTS[i];
+    var node = document.createElement('div');
     node.className = 'node';
 
-    node.innerHTML = `
-        <span class="icon">${client.icon}</span>
-        <div class="title">${client.name}</div>
-        <div class="desc">${client.desc}</div>
-        <button class="client-btn" data-idx="${idx}">🔒 MỞ CLIENT</button>
-        <a class="bypass-link" href="${client.bypass}" target="_blank" rel="noopener">
-            Lấy key tại đây
-        </a>
-    `;
+    node.innerHTML =
+        '<span class="icon">' + client.icon + '</span>' +
+        '<div class="title">' + client.name + '</div>' +
+        '<div class="desc">' + client.desc + '</div>' +
+        '<button class="client-btn" data-idx="' + i + '">🔒 MỞ CLIENT</button>' +
+        '<a class="bypass-link" href="' + client.bypass + '" target="_blank" rel="noopener">Lấy key tại đây</a>';
 
     nodesContainer.appendChild(node);
-});
+}
 
-// ===== MATRIX RAIN =====
-const canvas = document.getElementById('matrixCanvas');
-const ctx = canvas.getContext('2d');
-let width, height, columns, drops;
-const fontSize = 15;
-const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*+=';
+/* ============================================================
+   MATRIX RAIN
+   ============================================================ */
+var canvas = document.getElementById('matrixCanvas');
+var ctx = canvas.getContext('2d');
+var width, height, columns, drops;
+var fontSize = 15;
+var chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*+=';
 
 function initCanvas() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
     columns = Math.floor(width / fontSize);
-    drops = new Array(columns).fill(1);
+    drops = [];
+    for (var i = 0; i < columns; i++) drops[i] = 1;
 }
 
 function drawMatrix() {
@@ -533,10 +536,10 @@ function drawMatrix() {
     ctx.fillRect(0, 0, width, height);
     ctx.font = fontSize + "px 'Courier New', monospace";
     ctx.textAlign = 'center';
-    for (let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        const x = i * fontSize + fontSize / 2;
-        const y = drops[i] * fontSize;
+    for (var i = 0; i < drops.length; i++) {
+        var text = chars.charAt(Math.floor(Math.random() * chars.length));
+        var x = i * fontSize + fontSize / 2;
+        var y = drops[i] * fontSize;
         if (Math.random() > 0.98) {
             ctx.fillStyle = '#fff';
             ctx.shadowColor = '#0f0';
@@ -557,23 +560,26 @@ initCanvas();
 drawMatrix();
 window.addEventListener('resize', initCanvas);
 
-// ===== MODAL LOGIC =====
-const modalOverlay = document.getElementById('modalOverlay');
-const modalTitle = document.getElementById('modalTitle');
-const modalTarget = document.getElementById('modalTarget');
-const keyInput = document.getElementById('keyInput');
-const errorMsg = document.getElementById('errorMsg');
-const confirmBtn = document.getElementById('confirmBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-const toast = document.getElementById('toast');
+/* ============================================================
+   MODAL LOGIC
+   ============================================================ */
+var modalOverlay = document.getElementById('modalOverlay');
+var modalTitle = document.getElementById('modalTitle');
+var modalTarget = document.getElementById('modalTarget');
+var keyInput = document.getElementById('keyInput');
+var errorMsg = document.getElementById('errorMsg');
+var confirmBtn = document.getElementById('confirmBtn');
+var cancelBtn = document.getElementById('cancelBtn');
+var toast = document.getElementById('toast');
 
-let currentClient = null;
+var currentClient = null;
 
-document.querySelectorAll('.client-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+var allBtns = document.querySelectorAll('.client-btn');
+for (var j = 0; j < allBtns.length; j++) {
+    allBtns[j].addEventListener('click', function (e) {
         e.stopPropagation();
-        const idx = parseInt(btn.dataset.idx);
-        const client = CLIENTS[idx];
+        var idx = parseInt(this.getAttribute('data-idx'), 10);
+        var client = CLIENTS[idx];
         if (!client) return;
 
         currentClient = client;
@@ -584,9 +590,9 @@ document.querySelectorAll('.client-btn').forEach(btn => {
         keyInput.value = '';
 
         modalOverlay.classList.add('active');
-        setTimeout(() => keyInput.focus(), 100);
+        setTimeout(function () { keyInput.focus(); }, 100);
     });
-});
+}
 
 function closeModal() {
     modalOverlay.classList.remove('active');
@@ -597,29 +603,24 @@ function closeModal() {
 
 cancelBtn.addEventListener('click', closeModal);
 
-keyInput.addEventListener('keydown', e => {
+keyInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') confirmBtn.click();
 });
 
-confirmBtn.addEventListener('click', () => {
+confirmBtn.addEventListener('click', function () {
     if (!currentClient) return;
-    const entered = keyInput.value.trim();
+    var entered = keyInput.value.trim();
 
     if (entered === '') {
         errorMsg.textContent = '⚠ VUI LÒNG NHẬP KEY';
         return;
     }
 
-    /* ============================================================
-       KIỂM TRA KEY:
-       - Nếu nhập ĐÚNG key riêng của client → mở
-       - HOẶC nhập ĐÚNG key vạn năng → mở (cho mọi client)
-       ============================================================ */
     if (entered === currentClient.key || entered === UNIVERSAL_KEY) {
         errorMsg.textContent = '';
         showToast('✓ XÁC THỰC THÀNH CÔNG // ĐANG MỞ CLIENT...');
-        const targetUrl = currentClient.link;
-        setTimeout(() => {
+        var targetUrl = currentClient.link;
+        setTimeout(function () {
             window.open(targetUrl, '_blank');
             closeModal();
         }, 600);
@@ -627,47 +628,37 @@ confirmBtn.addEventListener('click', () => {
         errorMsg.textContent = '✗ KEY KHÔNG HỢP LỆ // TRUY CẬP BỊ TỪ CHỐI';
         keyInput.value = '';
         keyInput.focus();
-        const modal = document.querySelector('.modal');
+        var modal = document.querySelector('.modal');
         modal.style.animation = 'none';
-        modal.offsetHeight;
+        void modal.offsetHeight;
         modal.style.animation = 'shake 0.4s';
     }
 });
 
-modalOverlay.addEventListener('click', e => {
+modalOverlay.addEventListener('click', function (e) {
     if (e.target === modalOverlay) closeModal();
 });
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
         closeModal();
     }
 });
 
-// ===== TOAST =====
-let toastTimer;
-function showToast(msg, isError = false) {
+/* ============================================================
+   TOAST
+   ============================================================ */
+var toastTimer;
+function showToast(msg, isError) {
     clearTimeout(toastTimer);
     toast.textContent = msg;
     toast.className = 'toast' + (isError ? ' error' : '');
     void toast.offsetWidth;
     toast.classList.add('show');
-    toastTimer = setTimeout(() => {
+    toastTimer = setTimeout(function () {
         toast.classList.remove('show');
     }, 2200);
 }
-
-// ===== SHAKE ANIM =====
-const styleShake = document.createElement('style');
-styleShake.textContent = `
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-10px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-6px); }
-    80% { transform: translateX(6px); }
-}`;
-document.head.appendChild(styleShake);
 </script>
 </body>
 </html>
