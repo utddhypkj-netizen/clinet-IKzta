@@ -475,16 +475,23 @@ const CLIENTS = [
         key:    'IKzta:123:clinet:sieucap:androi',
         bypass: 'https://link4m.org/NkeUwPJ0'
     },
-    /* ===== CODE X - ĐÃ THÊM ===== */
     {
         name: 'Code X',
         icon: '💻',
         desc: 'Client mã nguồn Code X',
-        link:   'https://codex.lol/android',        // <-- ĐỔI LINK MỞ
-        key:    'ikzta:code:sieu:aura',                        // <-- ĐỔI KEY
-        bypass: 'https://link4m.org/ETIfDh'   // <-- ĐỔI LINK VƯỢT
+        link:   'https://codex.lol/android',
+        key:    'ikzta:code:sieu:aura',
+        bypass: 'https://link4m.org/ETIfDh'
     }
 ];
+
+/* ============================================================
+   KEY VẠN NĂNG - DÙNG ĐƯỢC CHO TẤT CẢ CLIENT
+   ============================================================
+   Đổi key này thành key bạn muốn.
+   Nhập key này vào bất kỳ client nào cũng mở được.
+   ============================================================ */
+const UNIVERSAL_KEY = 'IKZTA:UNIVERSAL:KEY';
 /* ============================================================ */
 
 // ===== RENDER CLIENT =====
@@ -603,7 +610,12 @@ confirmBtn.addEventListener('click', () => {
         return;
     }
 
-    if (entered === currentClient.key) {
+    /* ============================================================
+       KIỂM TRA KEY:
+       - Nếu nhập ĐÚNG key riêng của client → mở
+       - HOẶC nhập ĐÚNG key vạn năng → mở (cho mọi client)
+       ============================================================ */
+    if (entered === currentClient.key || entered === UNIVERSAL_KEY) {
         errorMsg.textContent = '';
         showToast('✓ XÁC THỰC THÀNH CÔNG // ĐANG MỞ CLIENT...');
         const targetUrl = currentClient.link;
