@@ -22,6 +22,7 @@ body{
     font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;
     overflow-x:hidden;
 }
+[hidden]{display:none !important}
 #hole{position:fixed;inset:0;width:100%;height:100%;z-index:0}
 .vignette{
     position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -57,14 +58,14 @@ h1{
     grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
     gap:20px;
 }
+/* Không dùng backdrop-filter (rất nặng khi nền đang chuyển động) */
 .node{
-    background:rgba(6,3,12,.78);
+    background:rgba(6,3,12,.9);
     border:1px solid rgba(255,138,61,.35);
     border-radius:18px;
     padding:26px 20px 20px;
     text-align:center;
     display:flex;flex-direction:column;gap:10px;
-    backdrop-filter:blur(6px);
     box-shadow:0 0 22px rgba(138,108,255,.15),inset 0 0 24px rgba(255,138,61,.05);
     transition:transform .25s,box-shadow .25s,border-color .25s;
 }
@@ -73,7 +74,7 @@ h1{
     border-color:var(--ember);
     box-shadow:0 0 34px rgba(255,138,61,.45),inset 0 0 28px rgba(255,138,61,.12);
 }
-.icon{font-size:2.6rem;filter:drop-shadow(0 0 10px var(--ember))}
+.icon{font-size:2.6rem}
 .title{font-size:1.25rem;letter-spacing:.12em;color:var(--plasma)}
 .desc{font-size:.8rem;color:var(--dim)}
 .client-btn{
@@ -87,7 +88,7 @@ h1{
 }
 .client-btn:hover{background:var(--ember);color:#000;box-shadow:0 0 24px var(--ember)}
 .client-btn:active{transform:scale(.97)}
-.client-btn:focus-visible,.modal-btn:focus-visible,.bypass-link:focus-visible,.modal input:focus-visible{
+.client-btn:focus-visible,.modal-btn:focus-visible,.bypass-link:focus-visible,.modal input:focus-visible,.copy-btn:focus-visible,#scriptSearch:focus-visible,#eggSearch:focus-visible,.back-btn:focus-visible,.menu-card:focus-visible{
     outline:2px solid var(--violet);outline-offset:3px;
 }
 .bypass-link{
@@ -100,9 +101,55 @@ h1{
 .bypass-link::before{content:'🔗 '}
 .hint{margin-top:34px;text-align:center;font-size:.75rem;color:var(--dim);letter-spacing:.08em}
 
+/* ===== MENU / ĐIỀU HƯỚNG ===== */
+.view{animation:viewIn .25s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.menu-card{font:inherit;color:inherit;cursor:pointer}
+.back-btn{
+    display:block;margin:0 0 16px;padding:9px 18px;border-radius:999px;cursor:pointer;
+    background:transparent;border:1px solid var(--ember);color:var(--plasma);
+    font:inherit;font-size:.85rem;font-weight:bold;letter-spacing:.06em;
+    transition:background .2s,color .2s;
+}
+.back-btn:hover{background:var(--ember);color:#000}
+
+/* ===== SCRIPT LIST ===== */
+.scripts{
+    margin-top:0;padding:22px 18px;
+    background:rgba(6,3,12,.92);
+    border:1px solid rgba(255,138,61,.35);border-radius:18px;
+    box-shadow:0 0 22px rgba(138,108,255,.15);
+}
+.scripts-title{font-size:1.25rem;letter-spacing:.12em;color:var(--plasma);text-align:center}
+.scripts-sub{font-size:.8rem;color:var(--dim);text-align:center;margin:6px 0 14px}
+#scriptSearch,#eggSearch{
+    width:100%;padding:11px 14px;margin-bottom:12px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,138,61,.6);border-radius:10px;
+    color:var(--text);font:inherit;text-align:center;
+}
+#scriptSearch::placeholder,#eggSearch::placeholder{color:rgba(244,236,228,.35)}
+.script-list{max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain}
+.script-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:10px 14px;border-radius:12px;
+    border:1px solid rgba(255,138,61,.2);background:rgba(255,255,255,.02);
+    content-visibility:auto;contain-intrinsic-size:auto 48px;
+}
+.script-name{font-size:.9rem;color:var(--plasma)}
+.copy-btn{
+    padding:7px 16px;border-radius:999px;cursor:pointer;
+    background:transparent;border:1px solid var(--ember);color:var(--plasma);
+    font:inherit;font-size:.8rem;font-weight:bold;white-space:nowrap;
+    transition:background .2s,color .2s;
+}
+.copy-btn:hover{background:var(--ember);color:#000}
+.script-empty{text-align:center;font-size:.85rem;color:var(--dim);padding:12px}
+
+/* ===== MODAL ===== */
 .modal-overlay{
     position:fixed;inset:0;z-index:100;
-    background:rgba(0,0,0,.88);backdrop-filter:blur(6px);
+    background:rgba(0,0,0,.92);
     display:none;align-items:center;justify-content:center;padding:20px;
 }
 .modal-overlay.active{display:flex}
@@ -135,13 +182,18 @@ h1{
 .modal-btn:hover{background:var(--ember);color:#000;box-shadow:0 0 18px var(--ember)}
 .modal-btn.cancel{border-color:#ff5c6c;color:#ff5c6c}
 .modal-btn.cancel:hover{background:#ff5c6c;color:#000;box-shadow:0 0 18px #ff5c6c}
+#manualText{
+    width:100%;padding:10px;margin-bottom:12px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,138,61,.6);
+    border-radius:10px;color:var(--text);font:inherit;font-size:.8rem;
+}
 
 .toast{
     position:fixed;bottom:24px;left:50%;
     transform:translateX(-50%) translateY(100px);
     background:#05030a;border:1px solid var(--ember);color:var(--plasma);
     padding:12px 22px;border-radius:999px;font-size:.88rem;
-    z-index:200;opacity:0;transition:all .3s;max-width:90vw;text-align:center;
+    z-index:200;opacity:0;transition:transform .3s,opacity .3s;max-width:90vw;text-align:center;
     box-shadow:0 0 24px rgba(255,138,61,.5);
 }
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -162,9 +214,61 @@ h1{
     </p>
     </header>
 
-    <main class="nodes" id="nodesContainer"></main>
+    <!-- MÀN HÌNH CHÍNH: chọn Client hoặc Script -->
+    <div class="nodes view" id="viewHome">
+        <button class="node menu-card" data-go="client">
+            <span class="icon">🎮</span>
+            <div class="title">Client</div>
+            <div class="desc">Tải client Delta, Code X (cần key)</div>
+        </button>
+        <button class="node menu-card" data-go="scriptCats">
+            <span class="icon">📜</span>
+            <div class="title">Script</div>
+            <div class="desc">Script cho các game Roblox</div>
+        </button>
+    </div>
 
-    <p class="hint">Cần key để mở client</p>
+    <!-- PHẦN CLIENT -->
+    <div class="view" id="viewClient" hidden>
+        <button class="back-btn" data-go="home">← Quay lại</button>
+        <div class="nodes" id="nodesContainer"></div>
+        <p class="hint">Cần key để mở client</p>
+    </div>
+
+    <!-- PHẦN SCRIPT: chọn game -->
+    <div class="view" id="viewScriptCats" hidden>
+        <button class="back-btn" data-go="home">← Quay lại</button>
+        <div class="nodes">
+            <button class="node menu-card" data-go="blox">
+                <span class="icon">🍍</span>
+                <div class="title">Blox Fruits</div>
+                <div class="desc" id="bloxCount">Script</div>
+            </button>
+            <button class="node menu-card" data-go="egg">
+                <span class="icon">🥚</span>
+                <div class="title">Steal a Egg</div>
+                <div class="desc" id="eggCount">Script</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT BLOX FRUITS -->
+    <section class="scripts view" id="viewBlox" hidden>
+        <button class="back-btn" data-go="scriptCats">← Quay lại</button>
+        <div class="scripts-title">🍍 Script Blox Fruits</div>
+        <p class="scripts-sub">Bấm "Copy" rồi dán vào executor</p>
+        <input type="text" id="scriptSearch" placeholder="Tìm script..." autocomplete="off">
+        <div class="script-list" id="scriptList"></div>
+    </section>
+
+    <!-- SCRIPT STEAL A EGG -->
+    <section class="scripts view" id="viewEgg" hidden>
+        <button class="back-btn" data-go="scriptCats">← Quay lại</button>
+        <div class="scripts-title">🥚 Script Steal a Egg</div>
+        <p class="scripts-sub">Bấm "Copy" rồi dán vào executor</p>
+        <input type="text" id="eggSearch" placeholder="Tìm script..." autocomplete="off">
+        <div class="script-list" id="eggList"></div>
+    </section>
 </div>
 
 <div class="modal-overlay" id="modalOverlay">
@@ -176,6 +280,17 @@ h1{
         <div class="modal-buttons">
             <button class="modal-btn cancel" id="cancelBtn">Hủy</button>
             <button class="modal-btn" id="confirmBtn">Xác nhận</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="manualOverlay">
+    <div class="modal">
+        <div class="modal-title">Copy thủ công</div>
+        <div class="modal-target">Giữ vào ô bên dưới → Chọn tất cả → Sao chép</div>
+        <textarea id="manualText" readonly rows="6"></textarea>
+        <div class="modal-buttons">
+            <button class="modal-btn" id="manualClose">Đóng</button>
         </div>
     </div>
 </div>
@@ -235,14 +350,444 @@ for (var i = 0; i < CLIENTS.length; i++) {
 }
 
 /* ============================================================
-   HỐ ĐEN - đĩa bồi tụ nghiêng, ánh sáng uốn cong, sáng lệch về bên phải
+   SCRIPT BLOX FRUITS  [tên, code]
+   ============================================================ */
+var RAW = [
+ ['Omg Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()`],
+ ['Fly', `loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()`],
+ ['Fix Lag', `loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"))()`],
+ ['Teddy Hub (Hop Server)', `repeat task.wait() until game:IsLoaded() and game:GetService("Players") and game.Players.LocalPlayer and game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDYHUB-FREEMIUM"))()`],
+ ['Hoang Nguyen Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/HoangNguyenk8/Roblox/refs/heads/main/BF-Main.luau"))()`],
+ ['Thanh Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"))()`],
+ ['Quantum Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()`],
+ ['Min 1', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/Min/refs/heads/main/MinUp27Vn"))()`],
+ ['Min 2 (Min Hub V6)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/Min/refs/heads/main/MinN"))()`],
+ ['Banana Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Chiriku2013/BananaCatHub/refs/heads/main/BananaCatHub.lua"))()`],
+ ['Vector Hub', `loadstring(game:HttpGet("https://vectorhub.space"))()`],
+ ['Blue Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"))()`],
+ ['Trọng Nguyễn', `loadstring(game:HttpGet("https://raw.githubusercontent.com/trongnguyenhubbloxfruit/Cocaigidaumaphaiskid/refs/heads/main/TrongNguyenSTB.lua"))()`],
+ ['Ngọc Bổng', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/NgocBong/refs/heads/main/NgocBongVn"))()`],
+ ['Đạt Thg', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/DatThg/refs/heads/main/DatThgV3Eng"))()`],
+ ['Tsuo Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Tsuo7/TsuoHub/main/Tsuoscripts"))()`],
+ ['Redz Hub', `local Settings = {
+    JoinTeam = "Pirates"; -- Pirates / Marines
+    Translator = true;   -- true / false
+}
+
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/20f318386e3fbf069ee3fa797cfc9f34.lua"))()(Settings)`],
+ ['Maru Hub', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/KimP/refs/heads/main/MaruHub"))()`],
+ ['Rubu Tổng Hợp', `loadstring(game:HttpGet"https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/Rubutonghop.txt")()`],
+ ['Vxeze Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/VxezeHubMain"))()`],
+ ['Chill Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()`],
+ ['Rubu', `loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/RubuRoblox/refs/heads/main/RubuBF"))()`],
+ ['TBoy Roblox Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/TBoyRoblox727/TBoyRobloxYTB/refs/heads/main/TBeoMainBF.lua"))()`],
+ ['Nazuz Hub', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+getgenv().Team = "Pirates"
+loadstring(Game:HttpGet("https://raw.githubusercontent.com/NguyenAnhKhoaX/AnhKhoa2279/refs/heads/main/BloxFruits.lua"))()`],
+ ['Xero Hub', `getgenv().Team = "Marines" -- Pirates/Marines
+loadstring(game:HttpGet("https://raw.githubusercontent.com/verudous/Xero-Hub/main/main.lua"))()`],
+ ['Teddy Hub Farm (UI Banana)', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TeddyHub.lua"))()`],
+ ['Banana Kimpro', `loadstring(game:HttpGet("https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"))()`],
+ ['Hutao Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/hdksakst-ship-it/Hutao-Hub-Omega-X/refs/heads/main/Forsaken-V4-Fix.txt"))()`],
+ ['Hoho Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))()`],
+ ['Farm Chest', `loadstring(game:HttpGet("https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/TN-Tp-Chest.lua"))()`],
+ ['Gravity Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))()`],
+ ['Hiru Redz', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+getgenv().Settings = {
+    JoinTeam = true,
+    Team = "Marines" -- Pirates or Marines
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/KiddoHiru/BloxFruits/main/Source.lua"))()`],
+ ['Auto lấy Ghoul', `getgenv().Team = "Marines"
+getgenv().Get_Race = "Ghoul"
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/7a6c326e81861b3e1e7207c5d11ed755.lua"))()`],
+ ['Auto lấy Cyborg', `getgenv().Team = "Marines"
+getgenv().Get_Race = "Cyborg"
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/7a6c326e81861b3e1e7207c5d11ed755.lua"))()`],
+ ['Rubu v5', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua"))()`],
+ ['Xeter V1', `getgenv().Version = "V1"
+getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()`],
+ ['Xeter V2', `getgenv().Version = "V2"
+getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()`],
+ ['Xeter V3', `getgenv().Version = "V3"
+getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()`],
+ ['Xeter V4', `getgenv().Version = "V4"
+getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TlDinhKhoi/Xeter/refs/heads/main/Main.lua"))()`],
+ ['Trẩu v1', `loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/trauv2.lua"))()`],
+ ['Trẩu v2', `loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/TrauRobloxRedZV2.lua"))()`],
+ ['Trẩu v3', `loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxv3.lua"))()`],
+ ['Trẩu v4', `loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxredzv4.lua"))()`],
+ ['Trẩu v5', `loadstring(game:HttpGet("https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/traurobloxv5.lua"))()`],
+ ['Night Mystic', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NightMystic/Night-Mystic-/refs/heads/main/NightMystic"))()`],
+ ['King Rùa Hub', `repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer
+loadstring(game:HttpGet("https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua"))()`],
+ ['Kaitun V4', `getgenv().TeddyHub = {
+    ["Allies"] = {
+        "name","name",
+        "name"
+    },
+    ["Method"] = "Kill Players After Trial", -- Kill Players After Trial, Reset Player After Trial
+    ["MainAccount"] = "name", -- for teleport to server of main account
+    ["Team"] = "Marines",
+    ["Gear"] = "A-B-B", -- "A-A-B" or ""  NOT GEAR 1 and 5
+    ["ResetAfterTrial"] = true
+}
+loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/d91754ae22d3cd7e"))()`],
+ ['Ok Hub', `getgenv().team = "Pirates" -- Marines
+loadstring(game:HttpGet("https://raw.githubusercontent.com/fakekuri/Okhubhere/refs/heads/main/MainBloxFruit.lua"))()`],
+ ['Redz Hub Campuchia V4', `loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/Bloxfruits.lua"))()`],
+ ['Redz Campuchia V5', `loadstring(game:HttpGet("https://luacrack.site/index.php/InfinityScript/raw/Redz999Fake/RedzHubFake.luau"))()`],
+ ['Hinishi Hub', `getgenv().team = "Marines" -- Marines or Pirates
+_G.Translate = "English"
+-- Thai or Russian or Portuguese or Vietnamese
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Hinishi/Hinishi-Hub/refs/heads/main/Freemium.lua"))()`],
+ ['Nak Hub (V2)', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Naknohack/NakHubBF/refs/heads/main/Nak%20Hub%20V2.txt"))()`],
+ ['Nak Hub Redz', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Naknohack/Nakhubredz/refs/heads/main/Nakredz.txt"))()`],
+ ['Adz Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHubBeta/refs/heads/main/AnDepZaiHubBeta.lua"))()`],
+ ['Cokka Hub', `loadstring(game:HttpGet"https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua")()`],
+ ['Bacon Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))()`],
+ ['Meo X Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/VanHoangIOS/MeoXHub/refs/heads/main/Main.lua"))()`],
+ ['Nak Hub V3', `getgenv().Team = "Marines"
+_G.Mode = "VietNammess" -- hoặc "English"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Naknohack/NakHubBF/refs/heads/main/NakHubV3.txt"))()`],
+ ['Trẩu v8', `loadstring(game:HttpGet("https://raw.githubusercontent.com/traurobloxdeptrai/traukhoaito/refs/heads/main/traurobloxv8.lua"))()`],
+ ['Trẩu v9', `loadstring(game:HttpGet("https://raw.githubusercontent.com/trungdao2k4/buffalo/refs/heads/main/traurobloxv9.lua"))()`],
+ ['Aura Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura", true))()`],
+ ['Tiro Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/NTTLOL/Tiro-Hub/refs/heads/main/TiroDel.lua.txt"))()`],
+ ['Hdanh Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/HdanhHubBeta.lua.txt"))()`],
+ ['High Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HighLoader", true))()`],
+ ['Luck Random', `loadstring(game:HttpGet("https://raw.githubusercontent.com/GrinGuru/BloxFruits/refs/heads/main/5X%20LUCK"))()`],
+ ['Night Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/BF-Beta.lua"))()`],
+ ['Maru Hub Free', `loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/MaruHubV1/refs/heads/main/MainV1.Lua"))()`],
+ ['Banana Cat Hub Free', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+getgenv().Key = "XyZpQrStUvWxYzAbCdEfGhIjKl"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ohofo2279/Premium/refs/heads/main/BF-BananaCat.lua"))()`],
+ ['Ronix Hub', `loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/fda9babd071d6b536a745774b6bc681c.lua"))()`],
+ ['Jade Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade", true))()`],
+ ['Aurora Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly261/BloxFruits/main/Aurora", true))()`],
+ ['3Toc Hub', `getgenv().Team = "Marines" -- hoặc "Pirates"
+loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/245375592509cc0bcb3526982431ab18.lua"))()`],
+ ['Nak Hub V4', `getgenv().Team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Naknohack/NakHubBF/refs/heads/main/NakHubV4.lua"))()`],
+ ['Muxus Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/MuxusTL/BloxFruits/main/MuxusHub.lua"))()`],
+ ['Gangteng Hub', `loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/516a5669fc39b4945cd0609a08264505.lua"))()`],
+ ['Monster Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub"))()`],
+ ['Master Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/KiddoHiru/BloxFruits/main/MasterHub.lua"))()`],
+ ['Bapred Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/BapRed/main/BapRedHub"))()`],
+ ['Matsune Hub', `getgenv().Team = "Pirates"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/RealMatsune/Rolls-Rocye/refs/heads/main/Loading.lua"))()`],
+ ['Dersi X Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-DersiX/Dersi-X-Hub/refs/heads/main/Main.lua"))()`],
+ ['Draco Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/RealRyx/DracoMain/refs/heads/main/DracoHubMainV1.txt"))()`],
+ ['Sunny Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/xNaos/Sunny-Hub/refs/heads/main/Loader"))();`],
+ ['Arya Hub', `getgenv().Team = 'Pirates'
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hhl29042008-ops/script/refs/heads/main/main"))()`],
+ ['God Hub', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+loadstring(game:HttpGet("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/refs/heads/main/Loader.lua"))()`],
+ ['TDT Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua"))()`],
+ ['ZYN Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZynHub", true))()`],
+ ['Anni Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF"))()`],
+ ['Neverdying Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/Neverdying", true))()`],
+ ['Redz Moonlight', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main"))()`],
+ ['Hdanh Hub V2 (Banana x Maru)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/BananaHub.lua.txt"))()`],
+ ['Sigma Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/SigmaHubDangCap/BloxFruit/refs/heads/main/MainBloxFruit.lua"))()`],
+ ['TRon Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua"))()`],
+ ['Abacaxi Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()`],
+ ['Gravity Premium', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/MainPremium.lua"))()`],
+ ['Banana Red (Xenon)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/ngvanduy11/Xenon-Hub/refs/heads/main/XenonNew.lua.txt"))()`],
+ ['Realkid', `loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()`],
+ ['Draco Hub V2', `loadstring(game:HttpGet("https://raw.githubusercontent.com/RealRyx/MainDraco/refs/heads/main/DracoMain.lua"))()`],
+ ['Wano Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly261/FruitBlox/refs/heads/main/Wano", true))()`],
+ ['Darksoul Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/gamer8410/dont-see-/refs/heads/main/loader.lua"))()`],
+ ['Leo Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/khanghoang95130-byte/LeoMobile/refs/heads/main/LeoMobile.txt"))()`],
+ ['Bacon Banana', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+getgenv().team = "Marines"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/Bloxfruits.lua"))()`],
+ ['Midnight Hub', `repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+getgenv().Team = "Pirates"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua"))()`],
+ ['Phong Tổng Hợp', `loadstring(game:HttpGet("https://raw.githubusercontent.com/PhongIDK/PhongYeuEm/refs/heads/main/PhongTongHop"))()`],
+ ['Tumadam Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/TumadamMod/cwertyur/refs/heads/main/TumadamEng.lua"))()`],
+ ['Leo Mobile', `loadstring(game:HttpGet('https://raw.githubusercontent.com/khanghoang95130byte/LeoMobile/refs/heads/main/LeoMobilebanana.txt'))()`],
+ ['Banana Hub Fake 1', `loadstring(game:HttpGet("https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc"))()`]
+];
+
+
+/* ============================================================
+   SCRIPT STEAL A EGG  [tên, code]
+   ============================================================ */
+var RAW_EGG = [
+ ['AJJANS Hub (key)', `loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/3fcb385d3c782d11837cb680ae2a3ea4.lua"))()`],
+ ['Hoshi Hub (key)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fluxyyy333/HoshiOnTop/main/loader.lua"))()`],
+ ['Ouroboros Hub (key)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/napun87/1.OUROBOROS/refs/heads/main/1.OUROBOROS.lua"))()`],
+ ['Chiyo Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"))()`],
+ ['VALINC Hub', `loadstring(game:HttpGet("https://api.valincsyndicate.com/v1/releases/5502cba03703f4a3628d522d396b80d8.lua"))()`],
+ ['SOLIX Hub (key)', `loadstring(game:HttpGet("https://solixhub.com/loader"))()`],
+ ['Chronix Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/SmokeTY/Hidden-Scripts/main/Chronix%20Hub"))()`],
+ ['Speed Hub (key)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()`],
+ ['Fynessed Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV6/StealAnEgg/refs/heads/main/FynessedHub"))()`],
+ ['Znex Hub', `loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/181cfe2bd5df35ce78607b5ffb37c6666abd76eda11ff33b0f24a1b2d8ee935f/download"))()`],
+ ['Big Froot (key)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/hanniii1/Loader/refs/heads/main/BFLoader.lua"))()`],
+ ['Noclip', `loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()`],
+ ['Auto Equip', `loadstring(game:HttpGet("https://raw.githubusercontent.com/iLove-yuri/leeeeesbian/refs/heads/main/homumado.lua"))()`],
+ ['Auto Everything', `loadstring(game:HttpGet("https://pastebin.com/raw/W3RJSA0B"))()`],
+ ['INF Egg (ScriptVerse Hub)', `loadstring(game:HttpGet("https://scriptversekey.xyz/s/steal-an-egg"))()`],
+ ['Auto Steal', `loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/359e97f8618e9008afe5f496184ebb7c.lua"))()`],
+ ['Wish Hub', `loadstring(game:HttpGet("https://api.wishub.cloud/files/loader.lua"))()`],
+ ['Axon Hub (key)', `loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/97c3f6db55a2cf72141537a85458e5a7.lua"))()`],
+ ['Flow Hub', `loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/5946add9ab91f1e04cb005346a8b1968.lua"))()`],
+ ['Nasi Rendang Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/JualNasiRendang/loader/refs/heads/main/main.lua"))()`],
+ ['Kexxe Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/premiumbuddy/kex/refs/heads/main/kexxxx"))()`],
+ ['Nxeze Hub', `loadstring(game:HttpGet("https://vxezestudio.online/api/scripts/script_G5CGjqj2X3rOS/stream/init"))()`],
+ ['Night Hub (nokey) / Night SAE V2', `loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/StealAnEggs.luau"))()`],
+ ['Omg Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()`],
+ ['UB Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamUBHub/UBLoader/refs/heads/main/index/Key.lua"))()`],
+ ['Neverlose Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/inrate1337/NeverloseLoaderRoblox/refs/heads/main/main.luau"))()`],
+ ['Nemesis Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/loader/main/freeloader.lua", true))()`],
+ ['Zero Point Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/JaxRol/ZeroPoint/refs/heads/main/KeySystem"))()`],
+ ['Airflow Hub', `loadstring(game:HttpGet("https://airflowscript.com/loader"))()`],
+ ['Asvra Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/asvraRoblox/stealegg/refs/heads/main/main"))()`],
+ ['Probest Hub', `loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/0199b576f5c2d5a34159f0f9f4e1de0a566b4d1da5b1cfa5d2f71ade9bdcaa24/download"))()`],
+ ['GS Hub', `loadstring(game:HttpGet("https://gist.githubusercontent.com/spiritualgaming1123-beep/46ef55c5f8284e076aafc5ebd12233f4/raw/5b24749c3931c1838a76e64c9af508dcdd03700a/gistfile1.lua"))()`],
+ ['Sportsclub', `loadstring(game:HttpGet("https://loader.sportsclub.fun/loader.luau"))()`],
+ ['Yuri Hub', `_G.autoExec = false
+loadstring(game:HttpGet("https://raw.githubusercontent.com/iLove-yuri/leeeeesbian/refs/heads/main/homumado.lua"))()`],
+ ['Saiops Hub', `loadstring(game:HttpGet("https://api.saiops.cc/scripts/Steal-An-Egg-Script.lua"))()`],
+ ['Vantage Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/MisterNovitski/Vantage/refs/heads/main/mm2.txt", true))()`],
+ ['Nova Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/NovaHubRBLX/NovaHub/refs/heads/main/novahub.lua"))()`],
+ ['Rift Hub', `loadstring(game:HttpGet("https://rifton.top/loader.lua"))()`],
+ ['Fyy Hub', `loadstring(game:HttpGet("https://FyyCommunity.my.id"))()`],
+ ['Lumin Hub', `loadstring(game:HttpGet("http://luminon.top/loader.lua"))()`],
+ ['Lotus Hub SAE', `loadstring(game:HttpGet("https://gist.githubusercontent.com/angeryy-tvy/bfcbbcdca42aa47535cbbee1cfc4be87/raw/SAE-Main-Lotus.lua"))()`],
+ ['Clover Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Ryuun0x/Clover/main/main.lua"))()`],
+ ['Foxname Hub (nokey)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/Fn-stealanegg.lua"))()`],
+ ['Script không rõ tên (nokey)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/moshixzn/ahhagdienavd/refs/heads/main/Loader.lua.txt"))()`],
+ ['CRZ Hub', `loadstring(game:HttpGet("https://flowauth.net/v1/loaders/3c4e87ed34813171b0f8d53a108a7d88.lua"))()`],
+ ['Bypass Speed', `loadstring(game:HttpGet("https://raw.githubusercontent.com/napun87/stealanegg/refs/heads/main/bypassxspeed.lua"))()`],
+ ['Lennon Hub (V1 / V2)', `loadstring(game:HttpGet("https://raw.githubusercontent.com/lennonxscripts/lennonhub/main/stealaegg.lua"))()`],
+ ['Miranda Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaegg"))()`],
+ ['Nhoiix Hop SV 1', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Nhoiii/NhoiiiX-Hub-Dev/refs/heads/main/NhoiiiHopSv.lua"))()`],
+ ['Nhoiix Hop SV 2', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Nhoiii/NhoiiiXHub/refs/heads/main/NhoiiiXHopSv2.lua"))()`],
+ ['Decode Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzYumi/Decode/refs/heads/main/DE%3ACODE.lua", true))()`],
+ ['Potato Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/potatohub67/potatoscripts/refs/heads/main/stealaegg.lua"))()`],
+ ['Axur Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/XE3Scripts/Axur-sGamesHub/refs/heads/main/StealAnEgg"))()`],
+ ['UIam Hub', `loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/4fa5547b587b1f3110ad121fd9650a8256ed00c0c73ae49ecf07d2130a206125/download"))()`],
+ ['S0ftkillz', `loadstring(game:HttpGet("https://pastebin.com/raw/ZuEBwb5K"))()`],
+ ['ZK Hub', `loadstring(game:HttpGet("https://zkcommunity.cloud/loader-test.lua"))()`],
+ ['Zeroin Hub', `loadstring(game:HttpGet("https://zeroinhub.com/api/script"))()`],
+ ['NeoX Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/hassanxzayn-lua/NEOXHUBMAIN/refs/heads/main/loader", true))()`],
+ ['Aris Hub SAE', `-- key: ARIS_FREE_KEY
+loadstring(game:HttpGet("https://vxezestudio.online/api/scripts/script_kfXJrZUcmVdSv/stream/init"))()`],
+ ['Zero Hub', `loadstring(game:HttpGet("https://www.zeroimpact.online/raw/loader"))()`],
+ ['Realkid Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()`],
+ ['Miranda Hub V2', `loadstring(game:HttpGet("https://raw.githubusercontent.com/miirandahub/loader/refs/heads/main/stealaeggs"))()`],
+ ['Blyxo Hub', `loadstring(game:HttpGet("https://flowauth.net/v1/loaders/69d3463240384f3a73fbe32c178093a2.lua"))()`],
+ ['Zyphora Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/jdififjhdudis-del/ZZy/refs/heads/main/ZZy.lua"))()`],
+ ['Lest Hub', `getgenv().SCRIPT_KEY = "KEYLESS"
+loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/c916d48837ab69c48a9b3cafb04b49c8d9253af84cf8e403b19e2be302cbe67a/download"))()`],
+ ['Ronnei Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/elonmod/skibidi/refs/heads/main/Ronneihub-keyless.lua"))()`],
+ ['Voidshell Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidShell-null/VoidShell-Hub/refs/heads/main/Scripts/StealAnEgg.luau"))()`],
+ ['On Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/davizin713/ONhub/refs/heads/main/script.lua", true))()`],
+ ['Sena Hub', `loadstring(game:HttpGet('https://raw.githubusercontent.com/senarblx/sena/refs/heads/main/loader'))()`],
+ ['Darkness Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/Darkness-KingScripts/Steal-a-egg/refs/heads/main/Darknesshub"))()`],
+ ['Limbo Hub', `loadstring(game:HttpGet("https://limbohub.my.id/loader.lua"))()`],
+ ['Hip Hub', `loadstring(game:HttpGet("https://hiphub.cloud/api/script-roblox/loader"))()`],
+ ['Chilli Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()`],
+ ['Nava Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/VEZ2/NEVAHUB/main/2"))()`],
+ ['Clouth Hub', `loadstring(game:HttpGet("https://raw.githubusercontent.com/ClouthubOnTop/Loader/main/main.lua"))()`]
+];
+
+function toList(raw) {
+    return raw.map(function (r) { return {name: r[0], code: r[1], lower: r[0].toLowerCase()}; });
+}
+
+var GAMES = {
+    blox: {data: toList(RAW),     list: document.getElementById('scriptList'), search: document.getElementById('scriptSearch'), rendered: false},
+    egg:  {data: toList(RAW_EGG), list: document.getElementById('eggList'),    search: document.getElementById('eggSearch'),    rendered: false}
+};
+document.getElementById('bloxCount').textContent = GAMES.blox.data.length + ' script';
+document.getElementById('eggCount').textContent = GAMES.egg.data.length + ' script';
+
+/* ---------- COPY (nhiều cách, có hộp copy thủ công) ---------- */
+function fallbackCopy(text) {
+    var ok = false;
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { ta.setSelectionRange(0, text.length); } catch (e) {}
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+}
+
+function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text).then(
+            function () { return true; },
+            function () { return fallbackCopy(text); }
+        );
+    }
+    return Promise.resolve(fallbackCopy(text));
+}
+
+function showManual(text) {
+    var box = document.getElementById('manualText');
+    box.value = text;
+    document.getElementById('manualOverlay').classList.add('active');
+    box.focus();
+    box.select();
+}
+function closeManual() {
+    document.getElementById('manualOverlay').classList.remove('active');
+}
+document.getElementById('manualClose').addEventListener('click', closeManual);
+document.getElementById('manualOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeManual();
+});
+
+/* ---------- RENDER DANH SÁCH (1 listener chung mỗi game, DocumentFragment) ---------- */
+function renderList(g, filter) {
+    var q = (filter || '').toLowerCase().trim();
+    var frag = document.createDocumentFragment();
+    var count = 0; // số thứ tự luôn chạy liên tục từ 1
+    for (var n = 0; n < g.data.length; n++) {
+        var s = g.data[n];
+        if (q && s.lower.indexOf(q) === -1) continue;
+        count++;
+        var row = document.createElement('div');
+        row.className = 'script-item';
+        var label = document.createElement('span');
+        label.className = 'script-name';
+        label.textContent = count + '. ' + s.name;
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-i', n);
+        row.appendChild(label);
+        row.appendChild(btn);
+        frag.appendChild(row);
+    }
+    if (count === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'script-empty';
+        empty.textContent = 'Không tìm thấy script nào';
+        frag.appendChild(empty);
+    }
+    g.list.textContent = '';
+    g.list.appendChild(frag);
+    g.rendered = true;
+}
+
+function bindGame(g) {
+    g.list.addEventListener('click', function (e) {
+        var btn = e.target.closest('.copy-btn');
+        if (!btn) return;
+        var s = g.data[parseInt(btn.getAttribute('data-i'), 10)];
+        if (!s) return;
+        copyText(s.code).then(function (ok) {
+            if (ok) showToast('✓ Đã copy ' + s.name);
+            else showManual(s.code);
+        });
+    });
+    var timer;
+    g.search.addEventListener('input', function () {
+        var v = this.value;
+        clearTimeout(timer);
+        timer = setTimeout(function () { renderList(g, v); }, 120);
+    });
+}
+bindGame(GAMES.blox);
+bindGame(GAMES.egg);
+
+/* ============================================================
+   ĐIỀU HƯỚNG GIỮA CÁC MÀN HÌNH
+   ============================================================ */
+var VIEWS = {
+    home: 'viewHome',
+    client: 'viewClient',
+    scriptCats: 'viewScriptCats',
+    blox: 'viewBlox',
+    egg: 'viewEgg'
+};
+
+function showView(name) {
+    var id = VIEWS[name];
+    if (!id) return;
+    var g = GAMES[name];
+    if (g && !g.rendered) renderList(g, '');
+    var all = document.querySelectorAll('.view');
+    for (var v = 0; v < all.length; v++) all[v].hidden = (all[v].id !== id);
+    document.getElementById(id).scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-go]');
+    if (el) showView(el.getAttribute('data-go'));
+});
+
+/* ============================================================
+   HỐ ĐEN (bản nhẹ): các lớp tĩnh được vẽ sẵn 1 lần, nét vẽ gom theo nhóm,
+   không dùng shadowBlur mỗi khung hình, giới hạn 30fps
    ============================================================ */
 var canvas = document.getElementById('hole');
-var ctx = canvas.getContext('2d');
-var W, H, cx, cy, R, particles = [], stars = [];
+var ctx = canvas.getContext('2d', {alpha: false});
+var W, H, dpr, cx, cy, R, particles = [];
+var lastW = 0, lastH = 0;
 var TILT = 0.3, ROT = -0.16, COS = Math.cos(ROT), SIN = Math.sin(ROT);
 var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var speedScale = reduceMotion ? 0.15 : 1;
+var FRAME_MS = 1000 / 30;
+var lastT = 0;
+
+// canvas phụ (vẽ sẵn)
+var bgCv, gasCv, horCv, dopCv, beamCv;
+var gasS, horS, dopS, hx, hy, beamX, beamY, beamW, beamH;
+
+// nhóm nét vẽ: 3 mức nhiệt x 4 mức sáng
+var NB_H = 3, NB_B = 4, NB = NB_H * NB_B;
+var DISK_STYLE = [], DISK_W = [], LENS_STYLE = [];
+var diskLists = [[], []], lensLists = [];
+(function () {
+    var h, b, f;
+    for (h = 0; h < NB_H; h++) {
+        for (b = 0; b < NB_B; b++) {
+            var heat = (h + 0.5) / NB_H;
+            var br = 0.15 + ((b + 0.5) / NB_B) * 0.85;
+            DISK_STYLE.push('hsla(' + (26 + heat * 22) + ',100%,' + (45 + heat * 25 + br * 20) + '%,' + (0.12 + br * 0.6 * (0.4 + heat * 0.6)) + ')');
+            DISK_W.push(0.7 + heat * 1.3);
+        }
+    }
+    for (b = 0; b < NB_B; b++) {
+        var brl = 0.15 + ((b + 0.5) / NB_B) * 0.85;
+        LENS_STYLE.push('rgba(255,205,130,' + (0.18 + brl * 0.5) + ')');
+        lensLists.push([]);
+    }
+    for (f = 0; f < 2; f++) for (h = 0; h < NB; h++) diskLists[f].push([]);
+})();
+
+function mk(w, h) {
+    var c = document.createElement('canvas');
+    c.width = Math.ceil(w * dpr);
+    c.height = Math.ceil(h * dpr);
+    var g = c.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return {c: c, g: g};
+}
 
 function spawn(p, anywhere) {
     p.a = Math.random() * Math.PI * 2;
@@ -252,132 +797,196 @@ function spawn(p, anywhere) {
 }
 
 function initHole() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var o, g, k, grad;
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     W = window.innerWidth; H = window.innerHeight;
-    canvas.width = W * dpr; canvas.height = H * dpr;
+    lastW = W; lastH = H;
+    canvas.width = Math.ceil(W * dpr); canvas.height = Math.ceil(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     cx = W / 2; cy = H * 0.3;
     R = Math.min(W, H) * 0.085;
-    var n = Math.min(1100, Math.floor(W * H / 1500));
+
+    var n = Math.min(450, Math.floor(W * H / 2000));
     particles = [];
-    for (var i = 0; i < n; i++) particles.push(spawn({}, true));
-    stars = [];
-    for (var k = 0; k < 110; k++) stars.push({x: Math.random() * W, y: Math.random() * H, o: Math.random() * 0.55 + 0.15});
+    for (k = 0; k < n; k++) particles.push(spawn({}, true));
+
+    // nền: đen + sao + quầng sáng xa
+    o = mk(W, H); g = o.g;
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    for (k = 0; k < 110; k++) {
+        g.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.55 + 0.15) + ')';
+        g.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+    }
+    g.globalCompositeOperation = 'lighter';
+    g.strokeStyle = 'rgba(150,170,255,0.10)';
+    g.lineWidth = R * 0.14;
+    g.beginPath(); g.arc(cx, cy, R * 6.2, 0, Math.PI * 2); g.stroke();
+    bgCv = o.c;
+
+    // đám khí cam (sprite)
+    gasS = R * 3.2;
+    o = mk(gasS, gasS); g = o.g;
+    grad = g.createRadialGradient(gasS / 2, gasS / 2, 0, gasS / 2, gasS / 2, gasS / 2);
+    grad.addColorStop(0, 'rgba(255,150,60,0.10)');
+    grad.addColorStop(1, 'rgba(255,150,60,0)');
+    g.fillStyle = grad; g.fillRect(0, 0, gasS, gasS);
+    gasCv = o.c;
+
+    // chân trời sự kiện + viền sáng (vẽ sẵn, shadowBlur chỉ chạy 1 lần)
+    var pad = 24;
+    horS = 2 * (R + pad);
+    o = mk(horS, horS); g = o.g;
+    g.fillStyle = '#000';
+    g.beginPath(); g.arc(horS / 2, horS / 2, R, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = 'rgba(255,225,170,0.55)';
+    g.lineWidth = 1.5;
+    g.shadowColor = '#ffa850'; g.shadowBlur = 18;
+    g.beginPath(); g.arc(horS / 2, horS / 2, R, 0, Math.PI * 2); g.stroke();
+    horCv = o.c;
+
+    // điểm sáng chói bên phải (Doppler)
+    hx = cx + R * 1.5; hy = cy + R * 0.35;
+    dopS = R * 4.8;
+    o = mk(dopS, dopS); g = o.g;
+    grad = g.createRadialGradient(dopS / 2, dopS / 2, 0, dopS / 2, dopS / 2, dopS / 2);
+    grad.addColorStop(0, 'rgba(255,245,225,0.75)');
+    grad.addColorStop(0.25, 'rgba(255,190,100,0.4)');
+    grad.addColorStop(1, 'rgba(255,150,60,0)');
+    g.fillStyle = grad; g.fillRect(0, 0, dopS, dopS);
+    dopCv = o.c;
+
+    // vệt sáng ngang
+    var bp = 14;
+    beamX = cx - W * 0.35; beamW = W * 1.35;
+    beamH = 2 + 2 * bp;
+    beamY = cy + R * 0.3 - 1 - bp;
+    o = mk(beamW, beamH); g = o.g;
+    grad = g.createLinearGradient(0, 0, beamW, 0);
+    grad.addColorStop(0, 'rgba(255,200,120,0)');
+    grad.addColorStop(0.5, 'rgba(255,200,120,0.5)');
+    grad.addColorStop(0.62, 'rgba(255,240,210,0.9)');
+    grad.addColorStop(1, 'rgba(255,200,120,0)');
+    g.fillStyle = grad;
+    g.shadowColor = '#ffb054'; g.shadowBlur = 12;
+    g.fillRect(0, bp, beamW, 2);
+    beamCv = o.c;
 }
 
-function proj(r, a) {
-    var lx = r * Math.cos(a), ly = r * Math.sin(a) * TILT;
-    return [cx + lx * COS - ly * SIN, cy + lx * SIN + ly * COS];
-}
 function omega(p) { return 0.05 * Math.pow(R / p.r, 1.5) * p.s * speedScale; }
-function beam(a) { var b = 0.5 + 0.5 * Math.cos(a + 0.25); return b * b; } // sáng nhất ở bên phải
 
-function drawDisk(p, front) {
-    if ((Math.sin(p.a) > 0) !== front) return;
-    var a0 = p.a - omega(p) * 7;
-    var A = proj(p.r, a0), B = proj(p.r, p.a);
-    var heat = Math.max(0, 1 - (p.r - R) / (R * 5));
-    var br = 0.15 + beam(p.a) * 0.85;
-    ctx.strokeStyle = 'hsla(' + (26 + heat * 22) + ',100%,' + (45 + heat * 25 + br * 20) + '%,' + (0.12 + br * 0.6 * (0.4 + heat * 0.6)) + ')';
-    ctx.lineWidth = 0.7 + heat * 1.3;
-    ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke();
+function strokeDisk(front) {
+    var L = diskLists[front], id, j, list, p;
+    for (id = 0; id < NB; id++) {
+        list = L[id];
+        if (!list.length) continue;
+        ctx.strokeStyle = DISK_STYLE[id];
+        ctx.lineWidth = DISK_W[id];
+        ctx.beginPath();
+        for (j = 0; j < list.length; j++) {
+            p = particles[list[j]];
+            ctx.moveTo(p.ax, p.ay);
+            ctx.lineTo(p.bx, p.by);
+        }
+        ctx.stroke();
+    }
 }
 
-// Ảnh phía sau đĩa bị uốn cong vòng lên trên hố đen
-function drawLens(p) {
-    var s = Math.sin(p.a);
-    if (s >= 0) return;
-    var Rk = R * (1.04 + (p.r - R) / R * 0.06);
-    var b0 = p.a - omega(p) * 7;
-    var br = 0.15 + beam(p.a) * 0.85;
-    ctx.strokeStyle = 'rgba(255,205,130,' + (0.18 + br * 0.5) + ')';
+function strokeLens() {
+    var b, j, list, p;
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.cos(b0) * Rk, cy - Math.abs(Math.sin(b0)) * Rk * 0.98);
-    ctx.lineTo(cx + Math.cos(p.a) * Rk, cy - Math.abs(s) * Rk * 0.98);
-    ctx.stroke();
+    for (b = 0; b < NB_B; b++) {
+        list = lensLists[b];
+        if (!list.length) continue;
+        ctx.strokeStyle = LENS_STYLE[b];
+        ctx.beginPath();
+        for (j = 0; j < list.length; j++) {
+            p = particles[list[j]];
+            ctx.moveTo(p.lx1, p.ly1);
+            ctx.lineTo(p.lx2, p.ly2);
+        }
+        ctx.stroke();
+    }
 }
 
 function frame(t) {
-    var i, k, g;
+    requestAnimationFrame(frame);
+    var dtm = t - lastT;
+    if (dtm < FRAME_MS - 2) return;
+    lastT = t;
+    var kk = Math.min(dtm / 16.67, 4);
+    var i, k, p, id, f;
+
+    // reset nhóm
+    for (f = 0; f < 2; f++) for (id = 0; id < NB; id++) diskLists[f][id].length = 0;
+    for (id = 0; id < NB_B; id++) lensLists[id].length = 0;
+
+    // cập nhật + phân nhóm
     for (i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        p.a += omega(p);
-        p.r -= 0.02 * speedScale * (R / p.r);
+        p = particles[i];
+        var om = omega(p);
+        p.a += om * kk;
+        p.r -= 0.02 * speedScale * (R / p.r) * kk;
         if (p.r < R * 1.12) spawn(p, false);
+
+        var a0 = p.a - om * 7;
+        var ca0 = Math.cos(a0), sa0 = Math.sin(a0);
+        var ca = Math.cos(p.a), sa = Math.sin(p.a);
+        var lx, ly;
+        lx = p.r * ca0; ly = p.r * sa0 * TILT;
+        p.ax = cx + lx * COS - ly * SIN; p.ay = cy + lx * SIN + ly * COS;
+        lx = p.r * ca; ly = p.r * sa * TILT;
+        p.bx = cx + lx * COS - ly * SIN; p.by = cy + lx * SIN + ly * COS;
+
+        var heat = Math.max(0, 1 - (p.r - R) / (R * 5));
+        var bm = 0.5 + 0.5 * Math.cos(p.a + 0.25); bm = bm * bm; // sáng nhất ở bên phải
+        var hb = Math.min(NB_H - 1, (heat * NB_H) | 0);
+        var bb = Math.min(NB_B - 1, (bm * NB_B) | 0);
+        diskLists[sa > 0 ? 1 : 0][hb * NB_B + bb].push(i);
+
+        if (sa < 0) {
+            var Rk = R * (1.04 + (p.r - R) / R * 0.06);
+            p.lx1 = cx + ca0 * Rk; p.ly1 = cy - Math.abs(sa0) * Rk * 0.98;
+            p.lx2 = cx + ca * Rk;  p.ly2 = cy - Math.abs(sa) * Rk * 0.98;
+            lensLists[bb].push(i);
+        }
     }
 
+    // vẽ
     ctx.globalCompositeOperation = 'source-over';
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, W, H);
-    for (k = 0; k < stars.length; k++) {
-        ctx.fillStyle = 'rgba(255,255,255,' + stars[k].o + ')';
-        ctx.fillRect(stars[k].x, stars[k].y, 1, 1);
-    }
-
+    ctx.drawImage(bgCv, 0, 0, W, H);
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round';
 
-    // Quầng sáng mờ ở xa
-    ctx.strokeStyle = 'rgba(150,170,255,0.10)';
-    ctx.lineWidth = R * 0.14;
-    ctx.beginPath(); ctx.arc(cx, cy, R * 6.2, 0, Math.PI * 2); ctx.stroke();
-
-    // Đám khí cam trôi ở bên trái
     for (k = 0; k < 4; k++) {
         var gx = cx - R * (2 + k * 1.3) + Math.sin(t / 3000 + k) * R * 0.2;
         var gy = cy + Math.sin(k * 2) * R * 0.25;
-        g = ctx.createRadialGradient(gx, gy, 0, gx, gy, R * 1.6);
-        g.addColorStop(0, 'rgba(255,150,60,0.10)');
-        g.addColorStop(1, 'rgba(255,150,60,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(gx, gy, R * 1.6, 0, Math.PI * 2); ctx.fill();
+        ctx.drawImage(gasCv, gx - gasS / 2, gy - gasS / 2, gasS, gasS);
     }
 
-    // Nửa sau của đĩa + ảnh uốn cong
-    for (i = 0; i < particles.length; i++) { drawDisk(particles[i], false); drawLens(particles[i]); }
+    strokeDisk(0);   // nửa sau của đĩa
+    strokeLens();    // ảnh uốn cong
 
-    // Chân trời sự kiện
     ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,225,170,0.55)';
-    ctx.lineWidth = 1.5;
-    ctx.shadowColor = '#ffa850'; ctx.shadowBlur = 18;
-    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
-    ctx.shadowBlur = 0;
+    ctx.drawImage(horCv, cx - horS / 2, cy - horS / 2, horS, horS); // chân trời sự kiện
 
-    // Nửa trước của đĩa che ngang phần dưới hố đen
     ctx.globalCompositeOperation = 'lighter';
-    for (i = 0; i < particles.length; i++) drawDisk(particles[i], true);
-
-    // Điểm sáng chói bên phải (hiệu ứng Doppler)
-    var hx = cx + R * 1.5, hy = cy + R * 0.35;
-    g = ctx.createRadialGradient(hx, hy, 0, hx, hy, R * 2.4);
-    g.addColorStop(0, 'rgba(255,245,225,0.75)');
-    g.addColorStop(0.25, 'rgba(255,190,100,0.4)');
-    g.addColorStop(1, 'rgba(255,150,60,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(hx, hy, R * 2.4, 0, Math.PI * 2); ctx.fill();
-
-    // Vệt sáng ngang
-    var fx = cx - W * 0.35, fw = W * 1.35;
-    var lg = ctx.createLinearGradient(fx, 0, fx + fw, 0);
-    lg.addColorStop(0, 'rgba(255,200,120,0)');
-    lg.addColorStop(0.5, 'rgba(255,200,120,0.5)');
-    lg.addColorStop(0.62, 'rgba(255,240,210,0.9)');
-    lg.addColorStop(1, 'rgba(255,200,120,0)');
-    ctx.fillStyle = lg;
-    ctx.shadowColor = '#ffb054'; ctx.shadowBlur = 12;
-    ctx.fillRect(fx, cy + R * 0.3 - 1, fw, 2);
-    ctx.shadowBlur = 0;
-
-    requestAnimationFrame(frame);
+    strokeDisk(1);   // nửa trước che phần dưới hố đen
+    ctx.drawImage(dopCv, hx - dopS / 2, hy - dopS / 2, dopS, dopS);
+    ctx.drawImage(beamCv, beamX, beamY, beamW, beamH);
 }
+
 initHole();
 requestAnimationFrame(frame);
-window.addEventListener('resize', initHole);
+
+var resizeTimer;
+window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+        // bỏ qua việc thanh địa chỉ trên điện thoại co/giãn nhẹ
+        if (window.innerWidth === lastW && Math.abs(window.innerHeight - lastH) < 140) return;
+        initHole();
+    }, 200);
+});
 
 /* ============================================================
    MODAL LOGIC
@@ -458,7 +1067,9 @@ modalOverlay.addEventListener('click', function (e) {
 });
 
 document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeModal();
+    if (e.key !== 'Escape') return;
+    if (modalOverlay.classList.contains('active')) closeModal();
+    closeManual();
 });
 
 /* ============================================================
@@ -476,3 +1087,4 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+ 
